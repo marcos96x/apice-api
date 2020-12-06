@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS procedimento (
     procedimento_desc VARCHAR(320) NOT NULL,
     procedimento_data DATETIME NOT NULL,
     procedimento_status INT NOT NULL DEFAULT 1,
+    procedimento_tipo INT NOT NULL DEFAULT 1,
     procedimento_cliente INT,
 
     CONSTRAINT pk_procedimento

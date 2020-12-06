@@ -5,7 +5,7 @@ const app = express();
 consign()
     // .include('src/models')
     .then('lib/config.js')
-    //.then('src/core')
+    .then('src/middlewares')
     .then('src/controllers')
     .then('src/routes')
     .then('lib/boot.js')

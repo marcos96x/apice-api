@@ -70,6 +70,7 @@ const controller = {
                                         msg: "Cadastro realizado com sucesso!",
                                         token: token,
                                         id: rows2.insertId,
+                                        perm: 'cliente'
                                     }).end()
                                 }
                             })
@@ -113,12 +114,13 @@ const controller = {
                                 return res.status(200).send({
                                     msg: "Login realizado com sucesso!",
                                     token: token,
-                                    id: rowsLogin[0].usuario_id
+                                    id: rowsLogin[0].usuario_id,
+                                    perm: rowsLogin[0].usuario_tipo
                                 }).end()
                             }
                         })
                 } else {
-                    return res.status(404).send({ err: 'Usuário não encontrado' }).end()
+                    return res.status(201).send({ err: 'Usuário não encontrado' }).end()
                 }
 
             }

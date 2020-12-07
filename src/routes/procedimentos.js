@@ -7,6 +7,7 @@ module.exports = app => {
     const permPrestador = require('./../middlewares/permsPrestador');
 
     app.get('/procedimento/:procedimento_id', controllerProcedimentos.get)
+    app.get('/procedimentoCliente/:cliente_id', controllerProcedimentos.getByUser)
 
     app.route('/procedimento')
         .get(controllerProcedimentos.getAll)

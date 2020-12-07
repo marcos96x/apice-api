@@ -71,6 +71,32 @@ const controller = {
             })
         }        
     },
+     /**
+     * 
+    "usuario": {
+        "id": 1,
+    },
+    "token": token
+     */
+    getByUser: (req, res) => {
+        const id = req.params.cliente_id;
+        if(id > 0) {
+            database.query("SELECT * FROM procedimento WHERE procedimento_cliente = ?", [id], (err, rows) => {
+                if (err) {
+                    // Debug
+                    console.log(err);
+                    return res.status(500).send({ err: 'Internal database server error.' }).end()
+                } else {
+                    if(rows.length != []) {
+                        return res.status(200).send({ procedimentos: rows }).end()
+                    } else {
+                        return res.status(200).send({ procedimentos: [] }).end()
+                    }
+                    
+                }
+            })
+        }        
+    },
     /**
      * 
     "token": token

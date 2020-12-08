@@ -10,6 +10,74 @@ function geraToken(params = {}) {
 }
 
 const controller = {
+    /**
+     * 
+    "usuario": {
+        "login": "marcosLogin",
+        "senha": "123",
+        "nome": "Marcos Alexandre Rodrigues de Carvalho",
+        "email": "marcos@email.com"
+    }
+     */
+    registerPrestador: (req, res) => {
+        const { login, senha, nome, email } = req.body.usuario;
+
+        database.query("SELECT * FROM usuario WHERE usuario_login = ?;", [login], (err, rows) => {
+
+            if (err) {
+                // Debug
+                console.log(err);
+                return res.status(500).send({ err: 'Internal database server error.' }).end()
+            } else {
+                if (rows.length == []) {
+                    bcrypt.hash(senha, 10, (errHash, hash) => {
+                        if (errHash) {
+                            console.log(err);
+                            return res.status(500).send({ err: 'Internal server error.' }).end()
+                        } else {
+                            const data = [
+                                "default",
+                                "'prestador'",
+                                "'" + login + "'",
+                                "'" + hash + "'",
+                                "'" + nome + "'",
+                                "' '",
+                                "' '",
+                                "' '",
+                                "'" + email + "'",
+                                "''",
+                                "1"
+                            ]
+
+                            database.query("INSERT INTO usuario VALUES (" + data + ")", (err2, rows2) => {
+
+                                if (err2) {
+                                    // Debug
+                                    console.log(err2);
+                                    return res.status(500).send({ err: 'Internal database server error.' }).end()
+                                } else {
+                                    // Debug
+                                    console.log(rows2);
+
+                                    const token = "Bearer " + geraToken({ id: rows2.insertId, perm: 'cliente' });
+
+                                    return res.status(200).send({
+                                        msg: "Cadastro realizado com sucesso!",
+                                        token: token,
+                                        id: rows2.insertId,
+                                        perm: 'prestador'
+                                    }).end()
+                                }
+                            })
+                        }
+                    })
+                } else {
+                    return res.status(201).send({ err: 'Este login já está cadastrado.' }).end()
+                }
+            }
+        })
+
+    },
 
     /**
      * 
@@ -156,7 +224,7 @@ const controller = {
         // admin request
         const { id } = req.body;
 
-        database.query("SELECT * FROM usuario WHERE usuario_tipo = 'cliente'", (err, rows) => {
+        database.query("SELECT usuario.*, (SELECT COUNT(*) FROM procedimento WHERE procedimento_cliente = usuario_id) AS usuario_procedimentos FROM usuario WHERE usuario_tipo = 'cliente'", (err, rows) => {
             if (err) {
                 // Debug
                 console.log(err);
@@ -166,6 +234,30 @@ const controller = {
                     return res.status(200).send({ usuarios: rows }).end()
                 } else {
                     return res.status(401).send({ err: 'Você não tem permissão para executar esse recurso.' }).end()
+                }
+            }
+        })
+    },
+     /**
+     * {
+     *  id: 1,
+     *  token: token
+     * }
+     */
+    getAllPrestadores: (req, res) => {
+        // admin request
+        const { id } = req.body;
+
+        database.query("SELECT usuario.*, (SELECT COUNT(*) FROM procedimento WHERE procedimento_cliente = usuario_id) AS usuario_procedimentos FROM usuario WHERE usuario_tipo = 'prestador'", (err, rows) => {
+            if (err) {
+                // Debug
+                console.log(err);
+                return res.status(500).send({ err: 'Internal database server error.' }).end()
+            } else {
+                if (rows.length != []) {
+                    return res.status(200).send({ prestadores: rows }).end()
+                } else {
+                    return res.status(201).send({ err: 'Nenhum prestador encontrado.' }).end()
                 }
             }
         })

@@ -5,14 +5,19 @@ module.exports = app => {
     const permPrestador = require('./../middlewares/permsPrestador');
 
     app.post('/login', controllerUser.login);
-    app.post('/register', controllerUser.register);
+    app.post('/register', controllerUser.register);    
 
     app.post('/getUser', [controllerUser.getUser]);
 
     app.post('/userChangePassword', controllerUser.trocaSenha)
 
     app.route('/user')
-        // .all() inserir aqui o middleware        
+        // .all() inserir aqui o middleware       
+        .get([controllerUser.getAllClientes]) 
         .put(controllerUser.edit)
-        .delete([permPrestador.perms, controllerUser.delete])  
+        .delete([controllerUser.delete])  
+
+    // admin
+    app.post('/registerPrestador', [controllerUser.registerPrestador]);
+    app.get('/getPrestadores', [controllerUser.getAllPrestadores]);
 }

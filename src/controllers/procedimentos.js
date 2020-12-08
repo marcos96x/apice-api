@@ -23,7 +23,7 @@ const controller = {
      */
     register: (req, res) => {
         const { titulo, desc, tipo, cliente } = req.body.procedimento;
-
+        
         const data = [
             "default",
             "'" + titulo + "'",

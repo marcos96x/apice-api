@@ -9,7 +9,7 @@ module.exports = app => {
     app.get('/blog/:blog_id', controllerBlog.get)
     app.route('/blog')
         .get(controllerBlog.getAll)       
-        .post([permPrestador.perms, controllerBlog.register]) 
-        .put([permPrestador.perms, controllerBlog.edit])
-        .delete([permPrestador.perms, controllerBlog.delete])
+        .post([controllerBlog.register]) 
+        .put([controllerBlog.edit])
+        .delete([controllerBlog.delete])
 }

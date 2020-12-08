@@ -11,7 +11,7 @@ module.exports = app => {
 
     app.route('/procedimento')
         .get(controllerProcedimentos.getAll)
-        .post([permPrestador.perms, controllerProcedimentos.register]) 
-        .put([permPrestador.perms, controllerProcedimentos.edit])
-        .delete([permPrestador.perms, controllerProcedimentos.delete])
+        .post([controllerProcedimentos.register]) 
+        .put([controllerProcedimentos.edit])
+        .delete([controllerProcedimentos.delete])
 }

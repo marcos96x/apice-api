@@ -20,9 +20,9 @@ const controller = {
     }
      */
     registerPrestador: (req, res) => {
-        const { login, senha, nome, email } = req.body.usuario;
+        const { usuario_login, usuario_senha, usuario_nome, usuario_email, usuario_tipo } = req.body.usuario;
 
-        database.query("SELECT * FROM usuario WHERE usuario_login = ?;", [login], (err, rows) => {
+        database.query("SELECT * FROM usuario WHERE usuario_login = ?;", [usuario_login], (err, rows) => {
 
             if (err) {
                 // Debug
@@ -30,21 +30,21 @@ const controller = {
                 return res.status(500).send({ err: 'Internal database server error.' }).end()
             } else {
                 if (rows.length == []) {
-                    bcrypt.hash(senha, 10, (errHash, hash) => {
+                    bcrypt.hash(usuario_senha, 10, (errHash, hash) => {
                         if (errHash) {
                             console.log(err);
                             return res.status(500).send({ err: 'Internal server error.' }).end()
                         } else {
                             const data = [
                                 "default",
-                                "'prestador'",
-                                "'" + login + "'",
+                                "'" + usuario_tipo + "'",
+                                "'" + usuario_login + "'",
                                 "'" + hash + "'",
-                                "'" + nome + "'",
+                                "'" + usuario_nome + "'",
                                 "' '",
+                                "NOW()",
                                 "' '",
-                                "' '",
-                                "'" + email + "'",
+                                "'" + usuario_email + "'",
                                 "''",
                                 "1"
                             ]
@@ -59,7 +59,7 @@ const controller = {
                                     // Debug
                                     console.log(rows2);
 
-                                    const token = "Bearer " + geraToken({ id: rows2.insertId, perm: 'cliente' });
+                                    const token = "Bearer " + geraToken({ id: rows2.insertId, perm: usuario_tipo });
 
                                     return res.status(200).send({
                                         msg: "Cadastro realizado com sucesso!",
@@ -248,7 +248,7 @@ const controller = {
         // admin request
         const { id } = req.body;
 
-        database.query("SELECT usuario.*, (SELECT COUNT(*) FROM procedimento WHERE procedimento_cliente = usuario_id) AS usuario_procedimentos FROM usuario WHERE usuario_tipo = 'prestador'", (err, rows) => {
+        database.query("SELECT usuario.*, IF(usuario.usuario_status = 1, 'Ativo', 'Desativado') AS usuario_status_nome, (SELECT COUNT(*) FROM procedimento WHERE procedimento_cliente = usuario_id) AS usuario_procedimentos FROM usuario WHERE usuario_tipo = 'prestador'", (err, rows) => {
             if (err) {
                 // Debug
                 console.log(err);

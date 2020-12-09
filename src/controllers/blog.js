@@ -22,15 +22,15 @@ const controller = {
     "token": token
      */
     register: (req, res) => {
-        const { titulo, desc, desc_full, home } = req.body.blog;
+        const { blog_titulo, blog_desc, blog_desc_full, blog_home } = req.body.blog;
 
         const data = [
             "default",
-            "'" + titulo + "'",
-            "'" + desc + "'",
-            "'" + desc_full + "'",
+            "'" + blog_titulo + "'",
+            "'" + blog_desc + "'",
+            "'" + blog_desc_full + "'",
             "NOW()",
-            "'" + home + "'",
+            "'" + blog_home + "'",
         ]
 
         database.query("INSERT INTO blog VALUES (" + data + ")", (err2, rows2) => {
@@ -78,7 +78,7 @@ const controller = {
      */
     getAll: (req, res) => {
         // admin request
-        database.query("SELECT * FROM blog", (err, rows) => {
+        database.query("SELECT *, DATE_FORMAT(blog_data, '%d/%m/%Y às %h:%i:%s') AS blog_data, IF(blog_home = 1, 'Sim', 'Não') as blog_home_nome FROM blog", (err, rows) => {
             if (err) {
                 // Debug
                 console.log(err);
@@ -102,6 +102,7 @@ const controller = {
     "token": token
      */
     edit: (req, res) => {
+        
         database.query("UPDATE blog SET ? WHERE blog_id = ? ", [req.body.blog, req.body.blog.blog_id], (err, rows) => {
             if (err) {
                 return res.status(200).send({ err: err }).end()
@@ -120,8 +121,7 @@ const controller = {
     "token": token
      */
     delete: (req, res) => {
-        // admin request
-        
+        // admin request        
 
         database.query("DELETE FROM blog WHERE blog_id = ?", [req.body.blog.blog_id], (err2, rows2) => {
             if (err2) {

@@ -22,16 +22,16 @@ const controller = {
     "token": token
      */
     register: (req, res) => {
-        const { titulo, desc, tipo, cliente } = req.body.procedimento;
+        const { procedimento_titulo, procedimento_desc, procedimento_tipo, procedimento_cliente } = req.body.procedimento;
         
         const data = [
             "default",
-            "'" + titulo + "'",
-            "'" + desc + "'",
+            "'" + procedimento_titulo + "'",
+            "'" + procedimento_desc + "'",
             "NOW()",
             "1",
-            "'" + tipo + "'",
-            "'" + cliente + "'"
+            "'" + procedimento_tipo + "'",
+            "'" + procedimento_cliente + "'"
         ]
 
         database.query("INSERT INTO procedimento VALUES (" + data + ")", (err2, rows2) => {
@@ -81,7 +81,7 @@ const controller = {
     getByUser: (req, res) => {
         const id = req.params.cliente_id;
         if(id > 0) {
-            database.query("SELECT * FROM procedimento WHERE procedimento_cliente = ?", [id], (err, rows) => {
+            database.query("SELECT *, IF(procedimento_tipo = 1, 'Pacote', 'Avulso') AS procedimento_tipo_nome, IF(procedimento_status = 1, 'Ativo', 'Inativo') AS procedimento_status_nome  FROM procedimento WHERE procedimento_cliente = ?", [id], (err, rows) => {
                 if (err) {
                     // Debug
                     console.log(err);
@@ -103,7 +103,7 @@ const controller = {
      */
     getAll: (req, res) => {
         // admin request
-        database.query("SELECT procedimento.*, usuario.usuario_nome, usuario.usuario_id FROM procedimento JOIN usuario ON usuario.usuario_id = procedimento.procedimento_cliente", (err, rows) => {
+        database.query("SELECT procedimento.*, IF(procedimento_tipo = 1, 'Pacote', 'Avulso') AS procedimento_tipo_nome, IF(procedimento_status = 1, 'Ativo', 'Inativo') AS procedimento_status_nome, usuario.usuario_nome, usuario.usuario_id FROM procedimento JOIN usuario ON usuario.usuario_id = procedimento.procedimento_cliente", (err, rows) => {
             if (err) {
                 // Debug
                 console.log(err);

@@ -87,7 +87,7 @@ const controller = {
                 if (rows.length != []) {
                     return res.status(200).send({ blogs: rows }).end()
                 } else {
-                    return res.status(401).send({ err: 'Nenhuma postagem de blog foi encontrado.' }).end()
+                    return res.status(200).send({ msg: 'Nenhuma postagem de blog foi encontrado.' }).end()
                 }
             }
         })

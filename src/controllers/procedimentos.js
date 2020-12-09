@@ -112,7 +112,7 @@ const controller = {
                 if (rows.length != []) {
                     return res.status(200).send({ procedimentos: rows }).end()
                 } else {
-                    return res.status(401).send({ err: 'Nenhum procedimento foi encontrado.' }).end()
+                    return res.status(200).send({ msg: 'Nenhum procedimento foi encontrado.' }).end()
                 }
             }
         })

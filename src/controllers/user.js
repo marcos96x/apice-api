@@ -93,9 +93,9 @@ const controller = {
     }
      */
     register: (req, res) => {
-        const { login, senha, nome, cpf, nascimento, telefone, email } = req.body.usuario;
+        const { usuario_login, usuario_senha, usuario_nome, usuario_cpf, usuario_nascimento, usuario_telefone, usuario_email } = req.body.usuario;
 
-        database.query("SELECT * FROM usuario WHERE usuario_login = ?;", [login], (err, rows) => {
+        database.query("SELECT * FROM usuario WHERE usuario_login = ?;", [usuario_login], (err, rows) => {
 
             if (err) {
                 // Debug
@@ -103,22 +103,26 @@ const controller = {
                 return res.status(500).send({ err: 'Internal database server error.' }).end()
             } else {
                 if (rows.length == []) {
-                    bcrypt.hash(senha, 10, (errHash, hash) => {
+                    bcrypt.hash(usuario_senha, 10, (errHash, hash) => {
                         if (errHash) {
                             console.log(err);
                             return res.status(500).send({ err: 'Internal server error.' }).end()
                         } else {
+                            let ficha = '';
+                            if(req.body.usuario.usuario_ficha != undefined) {
+                                ficha = req.body.usuario.usuario_ficha;
+                            }
                             const data = [
                                 "default",
                                 "'cliente'",
-                                "'" + login + "'",
+                                "'" + usuario_login + "'",
                                 "'" + hash + "'",
-                                "'" + nome + "'",
-                                "'" + cpf + "'",
-                                "'" + nascimento + "'",
-                                "'" + telefone + "'",
-                                "'" + email + "'",
-                                "''",
+                                "'" + usuario_nome + "'",
+                                "'" + usuario_cpf + "'",
+                                "'" + usuario_nascimento + "'",
+                                "'" + usuario_telefone + "'",
+                                "'" + usuario_email + "'",
+                                "'" + ficha + "'",
                                 "1"
                             ]
 
@@ -188,7 +192,7 @@ const controller = {
                             }
                         })
                 } else {
-                    return res.status(201).send({ err: 'Usuário não encontrado' }).end()
+                    return res.status(200).send({ err: 'Usuário não encontrado' }).end()
                 }
 
             }
@@ -224,7 +228,7 @@ const controller = {
         // admin request
         const { id } = req.body;
 
-        database.query("SELECT usuario.*, (SELECT COUNT(*) FROM procedimento WHERE procedimento_cliente = usuario_id) AS usuario_procedimentos FROM usuario WHERE usuario_tipo = 'cliente'", (err, rows) => {
+        database.query("SELECT usuario.*, DATE_FORMAT(usuario_nascimento, '%Y-%m-%d') AS usuario_nascimento, IF(usuario.usuario_status = 1, 'Ativo', 'Desativado') AS usuario_status_nome, (SELECT COUNT(*) FROM procedimento WHERE procedimento_cliente = usuario_id) AS usuario_procedimentos FROM usuario WHERE usuario_tipo = 'cliente'", (err, rows) => {
             if (err) {
                 // Debug
                 console.log(err);
@@ -233,7 +237,7 @@ const controller = {
                 if (rows.length != []) {
                     return res.status(200).send({ usuarios: rows }).end()
                 } else {
-                    return res.status(401).send({ err: 'Você não tem permissão para executar esse recurso.' }).end()
+                    return res.status(200).send({ msg: 'Nenhum cliente encontrado.' }).end()
                 }
             }
         })
@@ -257,7 +261,7 @@ const controller = {
                 if (rows.length != []) {
                     return res.status(200).send({ prestadores: rows }).end()
                 } else {
-                    return res.status(201).send({ err: 'Nenhum prestador encontrado.' }).end()
+                    return res.status(200).send({ msg: 'Nenhum prestador encontrado.' }).end()
                 }
             }
         })
@@ -295,7 +299,16 @@ const controller = {
                 console.log(err);
                 return res.status(500).send({ err: 'Internal database server error.' }).end()
             } else {
-                return res.status(200).send({ msg: "Ok" }).end()
+                database.query("DELETE FROM procedimento WHERE procedimento_cliente = ?", [usuario_id], (err2, rows2) => {
+                    if (err2) {
+                        // Debug
+                        console.log(err);
+                        return res.status(500).send({ err: 'Internal database server error.' }).end()
+                    } else {
+                        return res.status(200).send({ msg: "Ok" }).end()
+                    }
+        
+                })
             }
 
         })

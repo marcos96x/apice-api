@@ -20,4 +20,6 @@ module.exports = app => {
     // admin
     app.post('/registerPrestador', [controllerUser.registerPrestador]);
     app.get('/getPrestadores', [controllerUser.getAllPrestadores]);
+
+    app.get('/relatorios', controllerUser.relatorios)
 }

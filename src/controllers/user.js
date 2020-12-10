@@ -356,7 +356,21 @@ const controller = {
                     });
             }
         })
+    },
+
+    relatorios: (req, res) => {
+        database.query("SELECT (SELECT COUNT(*) FROM usuario WHERE usuario_tipo = 'cliente' AND usuario_status = 1) AS clientes_ativos, (SELECT COUNT(*) FROM usuario WHERE usuario_tipo = 'cliente' AND usuario_status <> 1) AS clientes_inativos, (SELECT COUNT(*) FROM usuario WHERE usuario_tipo = 'prestador' AND usuario_status = 1) AS prestadores_ativos, (SELECT COUNT(*) FROM usuario WHERE usuario_tipo = 'prestador' AND usuario_status <> 1) AS prestadores_inativos, (SELECT COUNT(*) FROM procedimento WHERE procedimento_status = 1) AS procedimentos_ativos, (SELECT COUNT(*) FROM procedimento WHERE procedimento_status <> 1) AS procedimentos_inativos", (err, rows) => {
+            if (err) {
+                // Debug
+                console.log(err);
+                return res.status(500).send({ err: 'Internal database server error.' }).end()
+            } else {
+                return res.status(200).send({ relatorio: rows[0] }).end()
+            }
+        })
     }
+
+
 
 }
 
